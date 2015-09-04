@@ -5,7 +5,7 @@
   "companyName": "Q-Production",
   "versionLabel": "1.0",
   "sdkVersion": "3",
-  "targetPlatforms": ["basalt"],
+  "targetPlatforms": ["aplite", "basalt"],
   "watchapp": {
     "watchface": false
   },
@@ -13,6 +13,32 @@
     "dummy": 0
   },
   "resources": {
-    "media": []
+    "media": [
+    {
+      "type" : "png",
+      "name" : "MONSTER_ONE",
+      "file" : "images/1.png"
+    },
+    {
+      "type" : "png",
+      "name" : "MONSTER_TWO",
+      "file" : "images/2.png"
+    },
+    {
+      "type" : "png",
+      "name" : "MONSTER_THREE",
+      "file" : "images/3.png"
+    },
+    {
+      "type" : "png",
+      "name" : "MONSTER_FOUR",
+      "file" : "images/4.png"
+    },
+    {
+      "type" : "png",
+      "name" : "MONSTER_FIVE",
+      "file" : "images/5.png"
+    }
+    ]
   }
 }
