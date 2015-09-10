@@ -1,70 +1,39 @@
 #include <pebble.h>
 #include "Monster.h"
 #include "Resolution.h"
+#include "Menu.h"
 
 static Window *window;
 static TextLayer *text_layer;
-static SimpleMenuLayer * s_simple_menu_layer;
-static SimpleMenuItem s_menu_items[4];
-static SimpleMenuSection s_menu_sections[1];
+static MenuLayer *s_menu_layer;
 static BitmapLayer *s_icon_layer;
+static BitmapLayer *s_icon_layer2;
 static GBitmap *s_monster_one, *s_monster_two;
-static Monster *monster1;
-static Monster *monster2;
 static uint32_t monster_ids[5] = {RESOURCE_ID_MONSTER_ONE, RESOURCE_ID_MONSTER_TWO, RESOURCE_ID_MONSTER_THREE, RESOURCE_ID_MONSTER_FOUR, RESOURCE_ID_MONSTER_FIVE };
 
 void setup_menu_items();
 void setup_menu_sections();
 
 static void menu_handler_attack (int index, void *context) {
-    text_layer_set_text(text_layer, monster1->name);
-    monster_attack(monster2, monster1);
-    monster_attack(monster1, monster2);
-    Layer *window_layer = window_get_root_layer(window);
-    layer_mark_dirty(window_layer);
+  text_layer_set_text(text_layer, s_monster1->name);
+  monster_attack(s_monster2, s_monster1);
+  monster_attack(s_monster1, s_monster2);
+  Layer *window_layer = window_get_root_layer(window);
+  layer_mark_dirty(window_layer);
 }
 
 static void menu_handler_bag (int index, void *context) {
-    text_layer_set_text(text_layer, "Lets look in our bag!");
+  text_layer_set_text(text_layer, "Lets look in our bag!");
 }
 
 static void menu_handler_monster (int index, void *context) {
-    text_layer_set_text(text_layer, "Monster Change");
+  text_layer_set_text(text_layer, "Monster Change");
 }
 
 static void menu_handler_run (int index, void *context) {
-    text_layer_set_text(text_layer, "RUN AWAY!!!");
+  text_layer_set_text(text_layer, "RUN AWAY!!!");
 }
 
-void setup_menu_items()
-{
-  s_menu_items[0] = (SimpleMenuItem){
-    .title = "Attack",
-    .callback = menu_handler_attack,
-  };
-  s_menu_items[1] = (SimpleMenuItem){
-    .title = "Bag",
-    .callback = menu_handler_bag,
-  };
-  s_menu_items[2] = (SimpleMenuItem){
-    .title = "Monster",
-    .callback = menu_handler_monster,
-  };
-  s_menu_items[3] = (SimpleMenuItem){
-    .title = "RUN",
-    .callback = menu_handler_run,
-  };
-}
-
-void setup_menu_sections()
-{
-  s_menu_sections[0] = (SimpleMenuSection)
-  {
-    .title = NULL,
-    .items = s_menu_items,
-    .num_items = sizeof(s_menu_items) / sizeof(s_menu_items[0]),
-  };
-}
 
 static void click_config_provider(void *context) {
   //window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
@@ -75,8 +44,8 @@ static void click_config_provider(void *context) {
 static void update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   //graphics_context_set_fill_color(ctx, GColorFromRGB(0, 255, 0));
-  uint8_t life1 = monster_get_life_percent(monster1, LIFE_WIDTH);
-  uint8_t life2 = monster_get_life_percent(monster2, LIFE_WIDTH);
+  uint8_t life1 = monster_get_life_percent(s_monster1, LIFE_WIDTH);
+  uint8_t life2 = monster_get_life_percent(s_monster2, LIFE_WIDTH);
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, GRect(bounds.size.w - LIFE_WIDTH_MARGIN - LIFE_WIDTH, bounds.size.h - LIFE_OWN_MARGIN, LIFE_WIDTH, LIFE_HEIGHT), 0, GCornerNone);
   graphics_fill_rect(ctx, GRect(LIFE_WIDTH_MARGIN, LIFE_ENEMY_MARGIN, LIFE_WIDTH, LIFE_HEIGHT), 0, GCornerNone);
@@ -96,27 +65,49 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_simple_menu_layer = simple_menu_layer_create((GRect)
+  s_menu_layer = menu_layer_create((GRect)
       {
-        .origin = { 0, bounds.size.h - MENU_HEIGHT },
-        .size = { bounds.size.w, MENU_HEIGHT }
-      }, window, s_menu_sections, 1, NULL);
-  layer_add_child(window_layer, (Layer *)s_simple_menu_layer);
+      .origin = { 0, bounds.size.h - MENU_HEIGHT },
+      .size = { bounds.size.w, MENU_HEIGHT }
+      });
+
+  menu_layer_set_callbacks(s_menu_layer, s_monster1, (MenuLayerCallbacks){
+      .get_num_sections = menu_get_num_sections_callback,
+      .get_num_rows = menu_get_num_rows_callback,
+      .get_header_height = menu_get_header_height_callback,
+      .draw_header = menu_draw_header_callback,
+      .draw_row = menu_draw_row_callback,
+      .select_click = menu_select_callback,
+      });
+
+  menu_layer_set_click_config_onto_window(s_menu_layer, window);
+  layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 
   s_monster_one = getRandomMonster();
   s_icon_layer = bitmap_layer_create((GRect)
       {
-        .origin = { MARGIN, bounds.size.h - MONSTER_OWN_MARGIN },
-        .size = { MONSTER_WIDTH, MONSTER_HEIGHT}
+      .origin = { MARGIN, bounds.size.h - MONSTER_OWN_MARGIN },
+      .size = { MONSTER_WIDTH, MONSTER_HEIGHT}
       });
   bitmap_layer_set_bitmap(s_icon_layer, s_monster_one);
   bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer));
 
+  s_monster_two = getRandomMonster();
+  s_icon_layer2 = bitmap_layer_create((GRect)
+      {
+      .origin = { bounds.size.w - MARGIN - MONSTER_WIDTH, MARGIN },
+      .size = { MONSTER_WIDTH, MONSTER_HEIGHT}
+      });
+  bitmap_layer_set_bitmap(s_icon_layer2, s_monster_two);
+  bitmap_layer_set_compositing_mode(s_icon_layer2, GCompOpSet);
+  layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer2));
+
+
   text_layer = text_layer_create((GRect)
       {
-        .origin = { 0, bounds.size.h - STATUS_MARGIN},
-        .size = { bounds.size.w, STATUS_HEIGHT }
+      .origin = { 0, bounds.size.h - STATUS_MARGIN},
+      .size = { bounds.size.w, STATUS_HEIGHT }
       });
   text_layer_set_text(text_layer, "");
   text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
@@ -133,11 +124,11 @@ static void init(void) {
   srand(time(NULL));
   window = window_create();
 
-  monster1 = monster_create("Monster_own", 35);
-  monster2 = monster_create("Monster_enemy", 64);
+  s_monster1 = monster_create("Monster_own", 35);
+  s_monster2 = monster_create("Monster_enemy", 64);
 
-  setup_menu_items();
-  setup_menu_sections();
+  //active_field = menu_items;
+
   window_set_background_color(window, GColorWhite);
 
   window_set_click_config_provider(window, click_config_provider);

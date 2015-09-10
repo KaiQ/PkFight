@@ -1,6 +1,19 @@
 #include "Monster.h"
 
 
+void monster_set_attacks(Monster *monster)
+{
+  monster->attacks[0] = &s_attacks[rand() % ATTACKS_COUNT];
+  monster->attacks[1] = &s_attacks[rand() % ATTACKS_COUNT];
+  monster->attacks[2] = &s_attacks[rand() % ATTACKS_COUNT];
+  monster->attacks[3] = &s_attacks[rand() % ATTACKS_COUNT];
+}
+
+char*    monster_get_attack_name(Monster* monster, uint8_t index)
+{
+  return monster->attacks[index]->name;
+}
+
 Monster* monster_create(char* name, uint8_t level)
 {
   Monster *monster = (Monster*)malloc(sizeof(Monster));
@@ -10,13 +23,15 @@ Monster* monster_create(char* name, uint8_t level)
   monster->level = level;
   monster->status = STATUS_NORMAL;
   monster->type = TYPE_NORMAL;
+  monster_set_attacks(monster);
   return monster;
 }
 
 
 uint8_t monster_attack(Monster *monster_1, Monster *monster_2)
 {
-  monster_2->hp -= 5; //TODO Attack calculation
+  if (monster_1->status == STATUS_NORMAL)
+    monster_2->hp -= 5; //TODO Attack calculation
   return monster_2->hp;
 }
 
