@@ -1,10 +1,10 @@
 #ifndef RESOLUTION_H
 #define RESOLUTION_H
 
-#define MENU_HEIGHT 44
+#define MENU_HEIGHT 30
 #define MONSTER_HEIGHT 56
 #define MONSTER_WIDTH 56
-#define STATUS_HEIGHT 17
+#define STATUS_HEIGHT 30
 #define MARGIN 5
 #define LIFE_WIDTH 30
 #define LIFE_HEIGHT 3

@@ -19,8 +19,6 @@ typedef struct
 } Monster;
 
 
-static Monster *s_monster1;
-static Monster *s_monster2;
 Monster* monster_create (char* name, uint8_t level);
 uint8_t  monster_attack (Monster *monster1, Monster *monster2);
 uint8_t  monster_get_life_percent(Monster *monster, uint8_t max);

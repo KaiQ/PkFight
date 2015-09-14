@@ -8,7 +8,9 @@ static TextLayer *text_layer;
 static MenuLayer *s_menu_layer;
 static BitmapLayer *s_icon_layer;
 static BitmapLayer *s_icon_layer2;
-static GBitmap *s_monster_one, *s_monster_two;
+static Monster *s_monster1;
+static Monster *s_monster2;
+static GBitmap *s_monster1_image, *s_monster2_image;
 static uint32_t monster_ids[5] = {RESOURCE_ID_MONSTER_ONE, RESOURCE_ID_MONSTER_TWO, RESOURCE_ID_MONSTER_THREE, RESOURCE_ID_MONSTER_FOUR, RESOURCE_ID_MONSTER_FIVE };
 
 void setup_menu_items();
@@ -61,6 +63,14 @@ GBitmap* getRandomMonster()
 }
 
 
+void updateStatus(char* message)
+{
+  text_layer_set_text(text_layer, message);
+  Layer *window_layer = window_get_root_layer(window);
+  layer_mark_dirty(window_layer);
+}
+
+
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
@@ -78,28 +88,29 @@ static void window_load(Window *window) {
       .draw_header = menu_draw_header_callback,
       .draw_row = menu_draw_row_callback,
       .select_click = menu_select_callback,
+      .get_cell_height = menu_get_cell_height_callback,
       });
 
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 
-  s_monster_one = getRandomMonster();
+  s_monster1_image = getRandomMonster();
   s_icon_layer = bitmap_layer_create((GRect)
       {
       .origin = { MARGIN, bounds.size.h - MONSTER_OWN_MARGIN },
       .size = { MONSTER_WIDTH, MONSTER_HEIGHT}
       });
-  bitmap_layer_set_bitmap(s_icon_layer, s_monster_one);
+  bitmap_layer_set_bitmap(s_icon_layer, s_monster1_image);
   bitmap_layer_set_compositing_mode(s_icon_layer, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer));
 
-  s_monster_two = getRandomMonster();
+  s_monster2_image = getRandomMonster();
   s_icon_layer2 = bitmap_layer_create((GRect)
       {
       .origin = { bounds.size.w - MARGIN - MONSTER_WIDTH, MARGIN },
       .size = { MONSTER_WIDTH, MONSTER_HEIGHT}
       });
-  bitmap_layer_set_bitmap(s_icon_layer2, s_monster_two);
+  bitmap_layer_set_bitmap(s_icon_layer2, s_monster2_image);
   bitmap_layer_set_compositing_mode(s_icon_layer2, GCompOpSet);
   layer_add_child(window_layer, bitmap_layer_get_layer(s_icon_layer2));
 
@@ -111,6 +122,7 @@ static void window_load(Window *window) {
       });
   text_layer_set_text(text_layer, "");
   text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
+  text_layer_set_overflow_mode(text_layer, GTextOverflowModeWordWrap);
   layer_add_child(window_layer, text_layer_get_layer(text_layer));
   layer_set_update_proc(window_layer, update_proc);
 }
