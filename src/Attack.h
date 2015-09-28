@@ -7,7 +7,7 @@
 #define ATTACKS_COUNT 10
 
 
-static attack s_attacks[ATTACKS_COUNT] =
+static Attack s_attacks[ATTACKS_COUNT] =
 {
   {
     .name = "Geowurf",

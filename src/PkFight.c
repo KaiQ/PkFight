@@ -18,24 +18,11 @@ void setup_menu_sections();
 
 static void menu_handler_attack (int index, void *context) {
   text_layer_set_text(text_layer, s_monster1->name);
-  monster_attack(s_monster2, s_monster1);
-  monster_attack(s_monster1, s_monster2);
+  //monster_attack(s_monster2, s_monster1);
+  //monster_attack(s_monster1, s_monster2);
   Layer *window_layer = window_get_root_layer(window);
   layer_mark_dirty(window_layer);
 }
-
-static void menu_handler_bag (int index, void *context) {
-  text_layer_set_text(text_layer, "Lets look in our bag!");
-}
-
-static void menu_handler_monster (int index, void *context) {
-  text_layer_set_text(text_layer, "Monster Change");
-}
-
-static void menu_handler_run (int index, void *context) {
-  text_layer_set_text(text_layer, "RUN AWAY!!!");
-}
-
 
 static void click_config_provider(void *context) {
   //window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
@@ -66,6 +53,15 @@ GBitmap* getRandomMonster()
 void updateStatus(char* message)
 {
   text_layer_set_text(text_layer, message);
+  Layer *window_layer = window_get_root_layer(window);
+  layer_mark_dirty(window_layer);
+}
+
+
+void player_attack(Monster* monster, Attack* attack)
+{
+  text_layer_set_text(text_layer, s_monster1->name);
+  monster_attack(s_monster1, attack, s_monster2);
   Layer *window_layer = window_get_root_layer(window);
   layer_mark_dirty(window_layer);
 }

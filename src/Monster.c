@@ -9,10 +9,18 @@ void monster_set_attacks(Monster *monster)
   monster->attacks[3] = &s_attacks[rand() % ATTACKS_COUNT];
 }
 
-char*    monster_get_attack_name(Monster* monster, uint8_t index)
+
+char* monster_get_attack_name(Monster* monster, uint8_t index)
 {
   return monster->attacks[index]->name;
 }
+
+
+Attack* monster_get_attack(Monster* monster, uint8_t index)
+{
+  return monster->attacks[index];
+}
+
 
 Monster* monster_create(char* name, uint8_t level)
 {
@@ -28,10 +36,10 @@ Monster* monster_create(char* name, uint8_t level)
 }
 
 
-uint8_t monster_attack(Monster *monster_1, Monster *monster_2)
+uint8_t monster_attack(Monster *monster_1, Attack* attack, Monster *monster_2)
 {
   if (monster_1->status == STATUS_NORMAL)
-    monster_2->hp -= 5; //TODO Attack calculation
+    monster_2->hp -= attack->damage * monster_1->level; //TODO Attack calculation
   return monster_2->hp;
 }
 

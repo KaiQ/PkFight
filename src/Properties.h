@@ -47,7 +47,7 @@ typedef struct
   uint8_t type;
   char*   name;
   float damage;
-} attack;
+} Attack;
 
 
 #endif

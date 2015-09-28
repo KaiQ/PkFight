@@ -117,6 +117,11 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
             {
               break;
             }
+          case MENU_ROW_MAIN_RUN:
+            {
+              updateStatus("We should Run...");
+              break;
+            }
         }
         break;
       }
@@ -127,10 +132,17 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
           set_menu_section(menu_layer, MENU_SECTION_MAIN, data);
           return;
         }
+        player_attack((Monster*) data, monster_get_attack((Monster*) data, cell_index->row));
         static char temp[90]; //just some large field
         strncpy(temp, "dein Monster benutzt ", 90);
         strcat(temp, monster_get_attack_name((Monster*)data, cell_index->row));
         updateStatus(temp);
+        set_menu_section(menu_layer, MENU_SECTION_MAIN, data);
+        break;
+      }
+    case MENU_SECTION_BAG:
+      {
+        updateStatus("Lets look in our Bag");
         break;
       }
   }

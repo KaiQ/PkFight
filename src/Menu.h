@@ -28,6 +28,7 @@ void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *da
 
 
 void updateStatus(char* message);
+void player_attack(Monster* monster, Attack* attack);
 
 #endif
 
